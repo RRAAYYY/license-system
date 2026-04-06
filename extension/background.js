@@ -1,45 +1,21 @@
-const CHECK_INTERVAL = 5 * 60 * 1000;
-chrome.alarms.create('checkLicenseStatus', { periodInMinutes: 5 });
-chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === 'checkLicenseStatus') {
-        checkLicenseExpiry();
-    }
-});
+// background.js
 
-async function checkLicenseExpiry() {
-    const { licensedKey, licenseData } = await chrome.storage.local.get(['licensedKey', 'licenseData']);
+// Function to check license expiry
+function checkLicenseExpiry() {
+    const expirationDate = new Date('2026-04-07T00:00:00Z'); // License expires on this date
+    const currentDate = new Date();
+    const remainingTime = expirationDate - currentDate;
+    const minutesRemaining = Math.floor(remainingTime / 1000 / 60);
 
-    if (licensedKey && licenseData) {
-        const expiry = new Date(licenseData.expiresAt);
-        const now = new Date();
-
-        if (now > expiry) {
-            chrome.action.setBadgeText({ text: '⚠' });
-            chrome.action.setBadgeBackgroundColor({ color: '#dc3545' });
-            chrome.tabs.query({}, (tabs) => {
-                tabs.forEach(tab => {
-                    chrome.tabs.sendMessage(tab.id, { action: 'licenseExpired' }).catch(() => {});
-                });
-            });
-        } else {
-            chrome.action.setBadgeText({ text: '✓' });
-            chrome.action.setBadgeBackgroundColor({ color: '#28a745' });
-        }
+    if (minutesRemaining <= 0) {
+        // License has expired
+        chrome.browserAction.setBadgeText({text: 'EXPIRED'});
     } else {
-        chrome.action.setBadgeText({ text: '' });
+        // Update badge text with remaining time
+        chrome.browserAction.setBadgeText({text: `${minutesRemaining} min`});
     }
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'checkLicense') {
-        chrome.storage.local.get(['licensedKey', 'licenseData'], (result) => {
-            sendResponse({ isActive: !!result.licensedKey && new Date(result.licenseData?.expiresAt) > new Date(), license: result.licenseData });
-        });
-        return true;
-    }
-});
-
-chrome.runtime.onInstalled.addListener(() => {
-    console.log('License Key System Extension installed');
-    checkLicenseExpiry();
-});
+// Check every 5 minutes
+setInterval(checkLicenseExpiry, 5 * 60 * 1000);
+checkLicenseExpiry();
