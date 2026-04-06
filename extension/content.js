@@ -1,31 +1,31 @@
-// Content script to inject key validation into web pages
+// Content script for injecting license validation scripts and handling license state changes across web pages
 
 (function() {
-    // Example function to validate keys
-    function validateKey(key) {
-        // Replace with actual validation logic
-        const validKeys = ['ABC123', 'XYZ789'];
-        return validKeys.includes(key);
-    }
+    // Check the current license state
+    const checkLicenseState = () => {
+        // Logic to check license state
+        console.log('Checking license state...');
+    };
 
-    // Hook into a specific event or element
-    document.addEventListener('DOMContentLoaded', function() {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Enter your key';
-        document.body.appendChild(input);
+    // Injecting the license validation script
+    const injectLicenseScript = () => {
+        const script = document.createElement('script');
+        script.src = chrome.runtime.getURL('path/to/license-validation-script.js');
+        document.body.appendChild(script);
+        console.log('License validation script injected.');
+    };
 
-        const button = document.createElement('button');
-        button.innerText = 'Validate Key';
-        document.body.appendChild(button);
-
-        button.addEventListener('click', function() {
-            const key = input.value;
-            if (validateKey(key)) {
-                alert('Key is valid!');
-            } else {
-                alert('Invalid key!');
-            }
-        });
+    // Listen for messages from the extension popup
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.action === 'updateLicenseState') {
+            // Logic to update license state
+            console.log('Updating license state...');
+            checkLicenseState();
+        }
     });
+
+    // Initial check for license state
+    checkLicenseState();
+    // Inject license script
+    injectLicenseScript();
 })();
