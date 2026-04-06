@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Key Input</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input[type='text'] { width: 250px; padding: 10px; margin-bottom: 10px; }
+        button { padding: 10px 15px; }
+        #featureUnlock { margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <h1>License Key Input</h1>
+    <input type="text" id="licenseKey" placeholder="Enter your license key" />
+    <button id="submit">Submit</button>
+    <div id="featureUnlock">
+        <h2>Unlock Features</h2>
+        <p>Select features to unlock:</p>
+        <ul>
+            <li><label><input type="checkbox" id="feature1"> Feature 1</label></li>
+            <li><label><input type="checkbox" id="feature2"> Feature 2</label></li>
+            <li><label><input type="checkbox" id="feature3"> Feature 3</label></li>
+        </ul>
+        <button id="unlock">Unlock Selected Features</button>
+    </div>
+    <script>
+        document.getElementById('submit').addEventListener('click', function() {
+            const key = document.getElementById('licenseKey').value;
+            // Here you can add your validation logic for the license key
+            if (key) {
+                document.getElementById('featureUnlock').style.display = 'block';
+            } else {
+                alert('Please enter a valid license key.');
+            }
+        });
+    </script>
+</body>
+</html>
